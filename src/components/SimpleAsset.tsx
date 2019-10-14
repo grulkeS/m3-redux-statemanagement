@@ -28,9 +28,11 @@ export default class SimpleAsset extends React.PureComponent<IProps, IState> {
         this.handleSwitchToEditMode = this.handleSwitchToEditMode.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleValueChange = this.handleValueChange.bind(this);
+        this.handleAmountChange = this.handleAmountChange.bind(this);
         this.handleSave = this.handleSave.bind(this);
         this.handleRerenderTest = this.handleRerenderTest.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+        this.handlesumAmount=this.handlesumAmount.bind(this);
 
         this.state = {
             edit_mode: props.edit,
@@ -47,10 +49,10 @@ export default class SimpleAsset extends React.PureComponent<IProps, IState> {
                 <tr>
                     <td><input type="text" name="name" value={this.props.asset.asset_name} onChange={this.handleNameChange} /></td>
                     <td><input type="number" name="value" value={this.props.asset.asset_value} onChange={this.handleValueChange} /> €</td>
-                    <td>
-                        <button onClick={this.handleSave} id={this.props.asset._id}>save</button>
-                        <button onClick={this.handleRerenderTest} >increase State Counter</button>
-                    </td>
+                    <td><input type="number" name="ammount" value={this.props.asset.asset_amount} onChange={this.handleAmountChange} /> stk</td>
+                    <td>{this.props.asset.asset_sumAmount}</td>
+                    <td> <button onClick={this.handleSave} id={this.props.asset._id}>save</button>
+                        <button onClick={this.handleRerenderTest} >increase State Counter</button></td>
                 </tr>
             )
         else
@@ -58,6 +60,8 @@ export default class SimpleAsset extends React.PureComponent<IProps, IState> {
                 <tr>
                     <td>{this.props.asset.asset_name}</td>
                     <td>{this.props.asset.asset_value} €</td>
+                    <td>{this.props.asset.asset_amount} stk</td>
+                    <td>{this.props.asset.asset_sumAmount}</td>
                     <td>
                         <button onClick={this.handleSwitchToEditMode}>edit</button>
                         <button onClick={this.handleDelete} id={this.props.asset._id}>sell or dispose</button>
@@ -72,7 +76,7 @@ export default class SimpleAsset extends React.PureComponent<IProps, IState> {
 
     handleNameChange(event: any) {
         const newAsset = this.props.asset;
-        newAsset.asset_name =  event.target.value
+        newAsset.asset_name = event.target.value
         const action: IAssetAction = {
             type: ActionType.update_asset,
             asset: newAsset
@@ -81,22 +85,55 @@ export default class SimpleAsset extends React.PureComponent<IProps, IState> {
     }
     handleValueChange(event: any) {
         const newAsset = this.props.asset;
-        newAsset.asset_value = event.target.value;
+        newAsset.asset_value = event.target.valueAsNumber;
+        const action: IAssetAction = {
+            type: ActionType.update_asset,
+            asset: newAsset
+        }
+        this.handlesumAmount();
+        this.handleSumMoney();
+        window.CS.clientAction(action);
+    }
+
+    handleAmountChange(event: any) {
+        const newAsset = this.props.asset;
+        newAsset.asset_amount = event.target.valueAsNumber;
+        const action: IAssetAction = {
+            type: ActionType.update_asset,
+            asset: newAsset
+        }
+        this.handlesumAmount();
+        this.handleSumMoney();
+        window.CS.clientAction(action);
+    }
+
+    handlesumAmount() {
+        const newAsset = this.props.asset;
+        newAsset.asset_sumAmount = (this.props.asset.asset_amount * this.props.asset.asset_value);
         const action: IAssetAction = {
             type: ActionType.update_asset,
             asset: newAsset
         }
         window.CS.clientAction(action);
     }
-
     
+    handleSumMoney() {
+        const newAsset = this.props.asset;
+        const action: IAssetAction = {
+            type: ActionType.calc_sum,
+            asset: newAsset
+        }
+
+        window.CS.clientAction(action);
+    }
+
     handleSave(event: any) {
         this.setState({ edit_mode: false });
     }
     handleDelete() {
         const action: IAssetAction = {
             type: ActionType.delete_asset,
-            asset:this.props.asset
+            asset: this.props.asset
         }
         window.CS.clientAction(action)
     }

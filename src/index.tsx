@@ -35,7 +35,9 @@ window.CS.getStore().subscribe(() => {
 const newAsset: IAssetData = {
   _id: mongoose.Types.ObjectId().toString(),
   asset_name: "Porsche comes from index.tsx",
-  asset_value: 50000
+  asset_value: 50000,
+  asset_amount: 1,
+  asset_sumAmount: 50000
 };
 const action: IAssetAction = {
   type: ActionType.create_asset,

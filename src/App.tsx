@@ -13,6 +13,8 @@ export interface IAssetData {
   _id: string;
   asset_name: string;
   asset_value: number;
+  asset_amount: number;
+  asset_sumAmount: number;
 }
 
 interface IState {
@@ -42,8 +44,15 @@ export default class App extends React.PureComponent<IProps, IState> {
         </p>
         <table>
           <tbody>
-            <tr><th>description</th><th>value</th><th>action</th></tr>
-            {window.CS.getBMState().assets.map(asset => <SimpleAsset key={asset._id} asset={asset} edit={false} />)}
+            <tr><th>description</th><th>value</th><th>amountItems</th><th>amountValue</th><th>action</th></tr>
+            {window.CS.getBMState().assets.map(asset => <SimpleAsset key={asset._id} asset={asset} edit={false}  />)}
+            <tr>
+            <td>Total Items: {window.CS.getBMState().assets.length}</td> 
+            <td></td> 
+            <td>{window.CS.getUIState().sumItems}</td>
+            <td>Total Worth: {window.CS.getUIState().sumMoney}</td>
+            <td id="blackTd"></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -55,7 +64,9 @@ export default class App extends React.PureComponent<IProps, IState> {
     const newAsset: IAssetData = {
       _id: mongoose.Types.ObjectId().toString(),
       asset_name: "",
-      asset_value: 0
+      asset_value: 0,
+      asset_amount: 1,
+      asset_sumAmount: 0
     }
     const action: IAssetAction = {
       type: ActionType.create_asset,
@@ -63,4 +74,7 @@ export default class App extends React.PureComponent<IProps, IState> {
     }
     window.CS.clientAction(action);
   }
+
+
+
 }
